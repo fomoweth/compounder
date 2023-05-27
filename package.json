@@ -1,0 +1,23 @@
+{
+    "name": "compounder",
+    "version": "1.0.0",
+    "description": "",
+    "keywords": [],
+    "author": "Ryan Kim",
+    "scripts": {
+        "hardhat": "hardhat",
+        "build": "npm run clean && npm run compile",
+        "clean": "hardhat clean",
+        "compile": "hardhat compile",
+        "test": "hardhat test"
+    },
+    "devDependencies": {
+        "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+        "chalk": "^4.1.2",
+        "dotenv": "^16.0.3",
+        "hardhat": "^2.14.0",
+        "hardhat-contract-sizer": "^2.8.0",
+        "hardhat-deploy": "^0.11.23",
+        "hardhat-tracer": "^1.2.1"
+    }
+}

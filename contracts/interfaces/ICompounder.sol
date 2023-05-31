@@ -21,9 +21,10 @@ interface ICompounder {
         uint128 indexed liquidityDelta
     );
 
-    event OperatorUpdated(
-        address indexed oldOperator,
-        address indexed newOperator
+    event Withdrawal(
+        address indexed token,
+        address indexed account,
+        uint256 indexed amount
     );
 
     function compound(
@@ -92,26 +93,6 @@ interface ICompounder {
     function getPositions(
         address account
     ) external view returns (uint256[] memory tokenIds);
-
-    // function getPosition(
-    //     address account,
-    //     uint256 idx
-    // )
-    //     external
-    //     view
-    //     returns (
-    //         uint256 tokenId,
-    //         address token0,
-    //         address token1,
-    //         uint24 fee,
-    //         int24 tickLower,
-    //         int24 tickUpper,
-    //         uint128 liquidity,
-    //         uint256 feeGrowthInside0LastX128,
-    //         uint256 feeGrowthInside1LastX128,
-    //         uint128 tokensOwed0,
-    //         uint128 tokensOwed1
-    //     );
 
     function ownerOf(uint256 tokenId) external view returns (address owner);
 

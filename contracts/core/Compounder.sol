@@ -21,6 +21,7 @@ contract Compounder is ICompounder, IERC721Receiver, Ownable, ReentrancyGuard {
     using TransferHelper for address;
 
     error EmptyPosition();
+    error InsufficientBalance();
     error InvalidNFT();
     error InvalidTokenId();
     error NewOperatorZeroAddress();
@@ -52,13 +53,6 @@ contract Compounder is ICompounder, IERC721Receiver, Ownable, ReentrancyGuard {
 
     modifier isOwnerOf(uint256 tokenId) {
         if (!_isOwnerOf(tokenId, msg.sender)) revert Restricted();
-        _;
-    }
-
-    modifier isApproved(uint256 tokenId) {
-        if (!_isOwnerOf(tokenId, msg.sender) && !_isOperator(msg.sender))
-            revert Restricted();
-        // if (!_isOwnerOf(tokenId, msg.sender)) revert Restricted();
         _;
     }
 
@@ -499,6 +493,17 @@ contract Compounder is ICompounder, IERC721Receiver, Ownable, ReentrancyGuard {
         nft.safeTransferFrom(address(this), msg.sender, tokenId);
     }
 
+    function withdrawTokens(address token, uint256 amount) external lock {
+        uint256 balance = _balances[msg.sender][token];
+        if (balance < amount) revert InsufficientBalance();
+
+        _balances[msg.sender][token] = balance - amount;
+
+        token.safeTransfer(msg.sender, amount);
+
+        emit Withdrawal(token, msg.sender, amount);
+    }
+
     function addPosition(uint256 tokenId, address account) internal {
         (address token0, address token1, , , , , , , , ) = positions(tokenId);
 
@@ -545,14 +550,6 @@ contract Compounder is ICompounder, IERC721Receiver, Ownable, ReentrancyGuard {
             token.tryApprove(address(nft), MAX_UINT256);
             token.tryApprove(address(swapper), MAX_UINT256);
         }
-    }
-
-    function setOperator(address newOperator) external onlyOwner {
-        if (newOperator == address(0)) revert NewOperatorZeroAddress();
-
-        emit OperatorUpdated(operator, newOperator);
-
-        operator = newOperator;
     }
 
     function computeMintAmountsToRatio(
@@ -714,9 +711,5 @@ contract Compounder is ICompounder, IERC721Receiver, Ownable, ReentrancyGuard {
         address account
     ) private view returns (bool) {
         return _ownerOf[tokenId] == account;
-    }
-
-    function _isOperator(address account) private view returns (bool) {
-        return account != address(0) && operator == account;
     }
 }
